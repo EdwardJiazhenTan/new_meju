@@ -42,7 +42,27 @@ export const RecipeFilterSchema = z.object({
   search: z.string().optional(),
 });
 
+/**
+ * Schema for shuffle query parameters
+ */
+export const ShuffleQuerySchema = z.object({
+  limit: z.coerce.number()
+    .int()
+    .min(1, 'Limit must be at least 1')
+    .max(20, 'Limit cannot exceed 20')
+    .default(3),
+
+  includeTags: z.string()
+    .transform(val => val ? val.split(',').map(s => s.trim()).filter(Boolean) : [])
+    .optional(),
+
+  excludeTags: z.string()
+    .transform(val => val ? val.split(',').map(s => s.trim()).filter(Boolean) : [])
+    .optional(),
+});
+
 // Export TypeScript types inferred from schemas
 export type CreateRecipeInput = z.infer<typeof CreateRecipeSchema>;
 export type UpdateRecipeInput = z.infer<typeof UpdateRecipeSchema>;
 export type RecipeFilter = z.infer<typeof RecipeFilterSchema>;
+export type ShuffleQuery = z.infer<typeof ShuffleQuerySchema>;

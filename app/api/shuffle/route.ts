@@ -35,8 +35,8 @@ export async function GET(
     // query the dishes with the constrains.
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '3');
-    const includeTags = searchParams.get('includeTags')?.split(',').filter(Boolen) || [];
-    const excludeTags = searchParams.get('excludeTags')?.split(',').filter(Boolen) || [];
+    const includeTags = searchParams.get('includeTags')?.split(',').filter(Boolean) || [];
+    const excludeTags = searchParams.get('excludeTags')?.split(',').filter(Boolean) || [];
 
     const whereClause: any = {
       userId: user.id,

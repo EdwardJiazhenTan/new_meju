@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { CreateRecipeSchema } from '@/lib/validations/recipe';
 import { ZodError } from 'zod';
-
-const prisma = new PrismaClient();
 
 // GET /api/recipes -- get all recipes
 export async function GET(request: NextRequest) {
@@ -72,36 +70,30 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    const { title, content, lables } = body;
 
-    // Validate with Zod
-    const validated = CreateRecipeSchema.parse(body);
-
-    // create a new recipe
-    const recipe = await prisma.recipe.create({
-      data: {
-        title: validated.title,
-        content: validated.content,
-        labels: validated.labels || [],
-        userId: user.id
-      }
-    });
-
-    return NextResponse.json({ recipe }, { status: 201 });
-  } catch (error) {
-    // Handle Zod validation errors
-    if (error instanceof ZodError) {
+    if (!title || !content) {
       return NextResponse.json(
-        {
-          error: 'Validation error',
-          details: error.issues
-        },
+        { error: 'no title or content found' },
         { status: 400 }
       );
     }
 
+    // create a new recipe
+    const recipe = await prisma.recipe.create({
+      data: {
+        title,
+        content,
+        labels: lables || [],
+        userId: user.id
+      }
+    });
+
+    return NextResponse.json({ recipe }, { status: 200 });
+  } catch (error) {
     console.error('Error create recipe: ', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'internal serer error' },
       { status: 500 }
     );
   }

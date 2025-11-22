@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface RecipeFormProps {
   initialData?: {
@@ -63,8 +68,8 @@ export function RecipeForm({ initialData, mode }: RecipeFormProps) {
         throw new Error(data.error || 'Failed to save recipe');
       }
 
-      //Redirect to dashboard on success
-      router.push('/dashboard');
+      const data = await response.json();
+      router.push(`/recipes/${data.recipe.id}`);
       router.refresh();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occured');
@@ -74,114 +79,127 @@ export function RecipeForm({ initialData, mode }: RecipeFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
-
-      {/* Title */}
-      <div>
-        <label htmlFor="title" className="block font-medium mb-2">
-          Title *
-        </label>
-
-        <input
-          id="title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          maxLength={200}
-          required
-          className="w-full border border-gray-300 rounded px-3 py-2 font-mono"
-          placeholder="# Recipe title"
-        />
-
-        {/* Recipe content in markdown */}
-        <textarea
-          id="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          rows={15}
-          className="w-full border border-gray-300 rounded px-3 py-2 font-mono"
-          placeholder="# Your Recipe goes here"
-        />
+    <div className="max-w-3xl mx-auto">
+      <div className="mb-8">
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight">
+          {mode === 'create' ? 'Create New Recipe' : 'Edit Recipe'}
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          {mode === 'create'
+            ? 'Add a new recipe to your collection using markdown formatting.'
+            : 'Update your recipe details and content.'}
+        </p>
       </div>
 
-      {/* Labels */}
-      <div>
-        <label htmlFor="label-input" className="block fort-medium mb-2">
-          Labels
-        </label>
-        <div className="flex gap-2 mb-2">
-          <input
-            id="label-input"
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="bg-destructive/15 border border-destructive text-destructive px-4 py-3 rounded-md">
+            {error}
+          </div>
+        )}
+
+        {/* Title */}
+        <div className="space-y-2">
+          <Label htmlFor="title" className="text-lg font-semibold">
+            Recipe Title <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="title"
             type="text"
-            value={labelInput}
-            onChange={(e) => setLabelInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleAddLabel();
-              }
-            }}
-            className="flex-1 border border-gray-300 rounded px-3 py-2"
-            placeholder="e.g., dinner, italian, pork"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={200}
+            required
+            className="font-medium"
           />
-
-          <button
-            type="button"
-            onClick={handleAddLabel}
-            className="px-4 py-2 bg-gray-200 rounded hober:bg-gray-300 text-black"
-          >
-            Add
-          </button>
         </div>
 
-        {/* Display labels */}
-        <div className="flex flex-wrap gap-2">
-          {labels.map((label) => (
-            <div className="flex">
-              <span
-                key={label}
-                className="px-3 py-1 rounded-full text-sm flex items-center gap-2"
-              >
-                {label}
-              </span>
+        {/* Content */}
+        <div className="space-y-2">
+          <Label htmlFor="content" className="text-lg font-semibold">
+            Recipe Content <span className="text-destructive">*</span>
+          </Label>
+          <p className="text-sm text-muted-foreground">
+            Use markdown formatting for headings, lists, and more.
+          </p>
+          <Textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            required
+            rows={20}
+            className="font-mono text-sm"
+          />
+        </div>
 
-              <button
-                type="button"
-                onClick={() => handleRemoveLabel(label)}
-                className="px-2 py-2 rounded bg-gray-200 text-black hover:bg-gray-300 disabled:bg-gray-700"
-              >
-                x
-              </button>
+        {/* Labels */}
+        <div className="space-y-2">
+          <Label htmlFor="label-input">Labels (Optional)</Label>
+          <p className="text-sm text-muted-foreground">
+            Add tags to help organize and find your recipes.
+          </p>
+          <div className="flex gap-2">
+            <Input
+              id="label-input"
+              type="text"
+              value={labelInput}
+              onChange={(e) => setLabelInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddLabel();
+                }
+              }}
+              placeholder="e.g., dinner, italian, vegetarian"
+            />
+            <Button
+              type="button"
+              onClick={handleAddLabel}
+              variant="secondary"
+            >
+              Add
+            </Button>
+          </div>
+
+          {/* Display labels */}
+          {labels.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {labels.map((label) => (
+                <div
+                  key={label}
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
+                >
+                  <span>{label}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveLabel(label)}
+                    className="hover:text-destructive ml-1"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
-
 
         {/* Buttons */}
-        <div className="flex gap-2">
-          <button
+        <div className="flex gap-3 pt-4">
+          <Button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-green-100 text-black rounded hover:bg-green-500 disabled:bg-gray-300"
           >
-            {loading ? "Loading" : mode === 'create' ? "Create Recipe" : "Update Recipe"}
-          </button>
-          <button
+            {loading ? "Saving..." : mode === 'create' ? "Create Recipe" : "Update Recipe"}
+          </Button>
+          <Button
             type="button"
             onClick={() => router.back()}
-            className=" text-black px-6 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            variant="outline"
           >
             Cancel
-          </button>
+          </Button>
         </div>
-
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

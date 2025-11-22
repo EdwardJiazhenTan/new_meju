@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { CreateRecipeSchema, UpdateRecipeSchema } from '@/lib/validations/recipe';
 import { ZodError } from 'zod';
-
-const prisma = new PrismaClient();
 
 // GET /api/recipes/[id] - get a single recipe
 export async function GET(
@@ -22,9 +20,11 @@ export async function GET(
 // PUT /api/recipes/[id] - update recipe
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -50,7 +50,7 @@ export async function PUT(
 
     const recipe = await prisma.recipe.updateMany({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
       },
       data: validated,
@@ -64,7 +64,7 @@ export async function PUT(
     }
 
     const updateRecipe = await prisma.recipe.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ recipe: updateRecipe });
@@ -86,9 +86,11 @@ export async function PUT(
 // DELETE /api/recipes/[id] - Delete recipe
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -111,7 +113,7 @@ export async function DELETE(
 
     const result = await prisma.recipe.deleteMany({
       where: {
-        id: params.id,
+        id,
         userId: user.id, // Ensure user owns the recipe
       },
     });

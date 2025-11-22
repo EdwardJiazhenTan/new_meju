@@ -1,54 +1,53 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { PrismaClient } from '@prisma/client';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import { AppSidebar } from "@/components/app-sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
-const prisma = new PrismaClient();
-
-export default async function DashboardPage() {
-  // get session on server
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    redirect('/login');
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email }
-  });
-
-  if (!user) {
-    redirect('/login');
-  }
-
-  const recipes = await prisma.recipe.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' }
-  });
-
+export default function Page() {
   return (
-    <div>
-      <h1> Dashboard</h1>
-      <p>welcome, {session.user.name || session.user.email}</p>
-
-      <div className="my-4">
-        <Link
-          href="/recipes/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          + Create New Recipe
-        </Link>
-      </div>
-
-      <h2>your recipes ({recipes.length})</h2>
-      <ul>
-        {recipes.map((recipe) => (
-          <li key={recipe.id}>
-            <h3>{recipe.title}</h3>
-            <p>{recipe.labels.join(', ')}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator
+            orientation="vertical"
+            className="mr-2 data-[orientation=vertical]:h-4"
+          />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="#">
+                  Building Your Application
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+          </div>
+          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }

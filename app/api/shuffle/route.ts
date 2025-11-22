@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { PrismaClient } from '@prisma/client';
-import { ZodError } from 'zod';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest
@@ -76,7 +73,7 @@ export async function GET(
     const shuffled = [...recipes];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j] = shuffled[j], shuffled[i]];
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     const result = shuffled.slice(0, limit);
 

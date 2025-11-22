@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.issues?.[0] || error.errors?.[0];
+      const firstError = error.issues?.[0];
       const errorMessage = firstError?.message || "Validation error";
       return NextResponse.json(
         { error: errorMessage },

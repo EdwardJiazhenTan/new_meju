@@ -8,11 +8,11 @@ import { ZodError } from 'zod';
 // GET /api/recipes/[id] - get a single recipe
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const recipeId = params.id;
+  const { id } = await params;
   const recipe = await prisma.recipe.findUnique({
-    where: { id: recipeId }
+    where: { id }
   });
   return NextResponse.json({ recipe });
 }

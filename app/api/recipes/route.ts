@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, lables } = body;
+    const { title, content, labels } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         content,
-        labels: lables || [],
+        labels: labels || [],
         userId: user.id
       }
     });

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Plus, Trash2, ChevronLeft } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +13,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuAction,
-  SidebarFooter,
-  useSidebar,
+  SidebarRail,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 
@@ -31,7 +30,6 @@ interface RecipesSidebarProps {
 export function RecipesSidebar({ recipes }: RecipesSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { toggleSidebar } = useSidebar();
   const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -79,6 +77,7 @@ export function RecipesSidebar({ recipes }: RecipesSidebarProps) {
 
   return (
     <Sidebar className="top-16 h-[calc(100vh-4rem)]">
+      <SidebarRail />
       {/* Header with search and new recipe button */}
       <SidebarHeader>
         <div className="flex items-center justify-between mb-2">
@@ -128,18 +127,6 @@ export function RecipesSidebar({ recipes }: RecipesSidebarProps) {
           </SidebarMenu>
         )}
       </SidebarContent>
-
-      {/* Footer with collapse button */}
-      <SidebarFooter>
-        <Button
-          onClick={toggleSidebar}
-          variant="ghost"
-          className="w-full justify-start"
-        >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Collapse
-        </Button>
-      </SidebarFooter>
     </Sidebar>
   );
 }

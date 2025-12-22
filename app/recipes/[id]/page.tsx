@@ -2,10 +2,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { Button } from '@/components/ui/button';
-import { ExportMarkdownButton } from '@/components/ExportMarkdownButton';
+import { RecipeActionsDropdown } from '@/components/RecipeActionsDropdown';
 
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -57,20 +55,14 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
               )}
             </div>
 
-            <div className="flex gap-2">
-              <ExportMarkdownButton
-                recipe={{
-                  title: selectedRecipe.title,
-                  content: selectedRecipe.content,
-                  labels: selectedRecipe.labels,
-                }}
-              />
-              <Button variant="outline" asChild>
-                <Link href={`/recipes/${selectedRecipe.id}/edit`}>
-                  Edit
-                </Link>
-              </Button>
-            </div>
+            <RecipeActionsDropdown
+              recipeId={selectedRecipe.id}
+              recipe={{
+                title: selectedRecipe.title,
+                content: selectedRecipe.content,
+                labels: selectedRecipe.labels,
+              }}
+            />
           </div>
         </div>
       </div>

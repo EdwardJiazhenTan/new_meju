@@ -12,22 +12,22 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
       <ReactMarkdown
         components={{
           h1: ({ children }) => (
-            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight mt-6 first:mt-0">
+            <h1 className="scroll-m-20 text-2xl font-extrabold tracking-tight mt-6 first:mt-0">
               {children}
             </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight mt-10 first:mt-0">
+            <h2 className="scroll-m-20 border-b pb-2 text-xl font-semibold tracking-tight mt-8 first:mt-0">
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mt-8">
+            <h3 className="scroll-m-20 text-lg font-semibold tracking-tight mt-6">
               {children}
             </h3>
           ),
           h4: ({ children }) => (
-            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight mt-6">
+            <h4 className="scroll-m-20 text-base font-semibold tracking-tight mt-4">
               {children}
             </h4>
           ),

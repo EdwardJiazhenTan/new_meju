@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Button } from '@/components/ui/button';
+import { ExportPDFButton } from '@/components/ExportPDFButton';
 
 export default async function RecipeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -57,6 +58,13 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
             </div>
 
             <div className="flex gap-2">
+              <ExportPDFButton
+                recipe={{
+                  title: selectedRecipe.title,
+                  content: selectedRecipe.content,
+                  labels: selectedRecipe.labels,
+                }}
+              />
               <Button variant="outline" asChild>
                 <Link href={`/recipes/${selectedRecipe.id}/edit`}>
                   Edit
